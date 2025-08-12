@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mood Muse — Shayari & Poems</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Abril+Fatface&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b0b10;
+      --card: rgba(255,255,255,0.08);
+      --card-border: rgba(255,255,255,0.18);
+      --text: #e8e8ef;
+      --muted: #b8b8c9;
+      --accent: #a8c5ff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      color: var(--text);
+      background: radial-gradient(60vmax 60vmax at 10% 10%, rgba(139,92,246,0.25), transparent 60%),
+                  radial-gradient(50vmax 60vmax at 90% 20%, rgba(14,165,233,0.25), transparent 60%),
+                  radial-gradient(70vmax 60vmax at 40% 90%, rgba(244,114,182,0.2), transparent 60%),
+                  linear-gradient(160deg, #0b0b10 0%, #12121a 100%);
+      min-height:100%;
+      overflow-x:hidden;
+    }
+    .mesh-blob{ position: fixed; inset: 0; pointer-events:none; filter: blur(65px) saturate(120%); opacity:0.8; mix-blend-mode: screen; z-index:-1; }
+    header{ max-width:1100px; margin: 24px auto; padding: 0 20px; display:flex; align-items:center; justify-content:space-between; }
+    .logo{ display:flex; align-items:center; gap:14px; font-weight:800; letter-spacing:0.5px }
+    .logo .dot{ width:14px; height:14px; border-radius:50%; background:#a78bfa; box-shadow:0 0 22px #a78bfa88 }
+    .brand{ font-family: "Abril Fatface", serif; font-size: clamp(40px, 5.8vw, 72px); letter-spacing:1px; line-height:1; }
+    .pill{ padding:10px 16px; border-radius:999px; background:var(--card); border:1px solid var(--card-border); font-size:12px; color:var(--muted); }
+    main{ max-width:1100px; margin:0 auto; padding: 24px 20px 100px; }
+    .card{ background: var(--card); border:1px solid var(--card-border); border-radius: 22px; padding: 20px 20px; backdrop-filter: blur(6px); box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+    .hero{ display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; align-items:stretch; }
+    @media (max-width: 880px){.hero{grid-template-columns: 1fr;}}
+
+    h1{ font-family: "Playfair Display", serif; font-weight:700; font-size: clamp(28px, 3.8vw, 48px); margin: 0 0 10px }
+    h2{ font-family: "Playfair Display", serif; font-weight:600; margin: 0 0 12px }
+    p.lead{ color:var(--muted); margin: 0 0 18px; line-height:1.6 }
+
+    .fields{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px }
+    .fields .full{ grid-column: 1 / -1 }
+    label{ font-size:13px; color:var(--muted); margin-bottom:6px; display:block }
+    input, select, textarea{ width:100%; padding: 12px 14px; border-radius:14px; background: rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text); outline:none; font-size:14px; }
+    textarea{ min-height:84px; resize:vertical }
+    .hint{ font-size:12px; color:#9aa2b1 }
+    .actions{ display:flex; gap:10px; margin-top: 10px; flex-wrap:wrap }
+    button{ padding: 12px 16px; border-radius:14px; background:linear-gradient(135deg, #7dd3fc, #a78bfa); color:#0b0b10; font-weight:700; border:none; cursor:pointer; box-shadow: 0 8px 22px rgba(167,139,250,0.25); }
+    button.secondary{ background:transparent; color:var(--text); border:1px solid var(--card-border) }
+
+    .emoji-bar{ display:flex; flex-wrap: wrap; gap:8px; margin: 4px 0 8px }
+    .emoji-btn{ font-size:22px; padding: 8px 10px; border-radius:12px; background: rgba(255,255,255,0.06); border:1px solid var(--card-border); cursor:pointer }
+
+    .section{ margin-top:22px }
+    .poem{ padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); position:relative; overflow:hidden }
+    .poem h3{ margin:0 0 6px; font-family: "Playfair Display", serif }
+    .poem pre{ white-space: pre-wrap; line-height:1.7; margin: 8px 0 0; font-family: ui-serif, Georgia, "Times New Roman", Times, serif }
+
+    .grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:14px }
+    @media (max-width: 880px){.grid{grid-template-columns: 1fr;}}
+
+    .toolbar{ display:flex; gap: 10px; align-items:center; justify-content:space-between; margin: 10px 0 6px }
+    .toolbar .meta{ font-size:13px; color:var(--muted) }
+
+    footer{ max-width:1100px; margin: 0 auto 40px; padding: 0 20px; color:var(--muted); font-size:12px; display:flex; justify-content:center }
+    .tiny{ font-size:12px; color:var(--muted) }
+
+    /* Floating micro-emoji confetti for the little-things vibe */
+    .spark{ position:absolute; font-size:14px; opacity:0.65; animation: drift 6s linear infinite; pointer-events:none }
+    @keyframes drift{ from{ transform: translateY(0) translateX(0) rotate(0deg) } to{ transform: translateY(-120px) translateX(40px) rotate(30deg) } }
+  </style>
+</head>
+<body>
+  <div class="mesh-blob"></div>
+  <header>
+    <div class="logo"><span class="dot"></span> <div class="brand">Mood&nbsp;Muse</div></div>
+    <div class="pill">Aesthetic, soft vibes • Mesh gradients • Shayari + Poems</div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="card">
+        <h1>Find words that match your mood.</h1>
+        <p class="lead">Tell us your name, choose an emoji, drop a keyword (<em>fine</em>, <em>sad</em>, <em>happy</em>…), or even upload a picture. We'll curate shayaris and poems just for you.</p>
+        <form id="moodForm" autocomplete="off">
+          <div class="fields">
+            <div>
+              <label for="name">Your name</label>
+              <input id="name" name="name" placeholder="e.g., Suryansh" required />
+            </div>
+            <div>
+              <label for="language">Language / भाषा</label>
+              <select id="language" name="language">
+                <option value="en">English</option>
+                <option value="hi">हिन्दी</option>
+                <option value="mix">Both / दोनों</option>
+              </select>
+            </div>
+            <div class="full">
+              <label for="mood">How are you feeling? (keywords or emojis)</label>
+              <input id="mood" name="mood" placeholder="fine, 😄, sad, 🥹, happy, 😴, in love ❤️…" />
+              <div class="emoji-bar" id="emojiBar"></div>
+              <div class="hint">Prefer visuals? Upload an image—colors & brightness help us guess the vibe. (We don’t store images.)</div>
+              <input type="file" id="imgInput" accept="image/*" />
+              <canvas id="imgCanvas" style="display:none"></canvas>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit">Curate for me ✨</button>
+            <button type="button" class="secondary" id="randomBtn">I'm not sure — surprise me</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:2px">Soft mesh, softer words</h2>
+        <p class="lead">A gentle space for verses. We always include <em>“I Wandered Lonely as a Cloud (Daffodils)”</em> by William Wordsworth, plus other classics and fresh shayari matched to your mood.</p>
+        <div class="poem">
+          <h3 style="margin:0">Why we ask mood?</h3>
+          <pre>So poems meet you where you are—
+not as a lecture, but a lantern.</pre>
+        </div>
+        <div class="tiny" style="margin-top:8px">Note: “Daffodils” is by William Wordsworth (often misattributed to Shakespeare!).</div>
+      </div>
+    </section>
+
+    <section id="results" class="section" style="display:none">
+      <div class="toolbar">
+        <div class="meta" id="greeting"></div>
+        <div>
+          <button id="switchLang" class="secondary" title="Toggle English/Hindi">Switch Language</button>
+        </div>
+      </div>
+      <div class="grid" id="poemGrid"></div>
+    </section>
+  </main>
+  <footer>
+    created with love ❤️ by <strong>SQUADBYTE</strong>
+  </footer>
+
+  <script>
+    // --- Simple animated mesh overlay ---
+    (function mesh() {
+      const el = document.querySelector('.mesh-blob');
+      function frame(t){
+        const a = Math.sin(t/2400)*30 + 30; // sizes wiggle
+        const b = Math.cos(t/3100)*40 + 40;
+        const c = Math.sin(t/2800 + 1.2)*50 + 50;
+        el.style.background = `radial-gradient(${a}vmax ${b}vmax at ${20 + Math.sin(t/2200)*30}% ${20 + Math.cos(t/2600)*20}%, rgba(167,139,250,0.18), transparent 60%),
+                                radial-gradient(${b}vmax ${c}vmax at ${80 + Math.cos(t/2000)*20}% ${25 + Math.sin(t/2400)*20}%, rgba(56,189,248,0.18), transparent 60%),
+                                radial-gradient(${c}vmax ${a}vmax at ${45 + Math.sin(t/1800)*10}% ${85 + Math.cos(t/2100)*10}%, rgba(244,114,182,0.14), transparent 60%)`;
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    // --- Mood detection via keywords, emoji, and image colors ---
+    const EMOJI_MAP = [
+      {e:'😀', m:'happy'}, {e:'😊', m:'happy'}, {e:'😄', m:'happy'}, {e:'✨', m:'motivated'}, {e:'🔥', m:'motivated'},
+      {e:'😔', m:'sad'}, {e:'🥲', m:'sad'}, {e:'😭', m:'sad'}, {e:'💧', m:'sad'},
+      {e:'😌', m:'calm'}, {e:'🧘', m:'calm'}, {e:'🌿', m:'calm'}, {e:'🌊', m:'calm'},
+      {e:'😤', m:'angry'}, {e:'😡', m:'angry'}, {e:'⚡', m:'angry'},
+      {e:'😳', m:'anxious'}, {e:'🥹', m:'anxious'}, {e:'😬', m:'anxious'},
+      {e:'❤️', m:'love'}, {e:'💖', m:'love'}, {e:'😍', m:'love'}, {e:'💌', m:'love'},
+      {e:'😶', m:'fine'}, {e:'🙂', m:'fine'}, {e:'😐', m:'fine'},
+      {e:'🕰️', m:'nostalgic'}, {e:'📼', m:'nostalgic'}, {e:'🌙', m:'lonely'}, {e:'🪟', m:'lonely'}
+    ];
+
+    const MOOD_MAP = {
+      sad: ['sad','down','heartbroken','blue','low','depressed','unhappy','gloom','upset','😭','😔','🥲','💧'],
+      happy: ['happy','joy','glad','delighted','ecstatic','excited','good','great','😀','😊','😄'],
+      fine: ['fine','okay','ok','alright','meh','normal','neutral','so-so','🙂','😐','😶','so so'],
+      lonely: ['lonely','alone','isolated','solitude','missing','miss','🌙','🪟'],
+      love: ['love','in love','crush','romantic','romance','beloved','pyaar','ishq','❤️','💖','😍','💌'],
+      angry: ['angry','mad','furious','annoyed','irritated','rage','😡','😤','⚡'],
+      anxious: ['anxious','anxiety','stressed','stress','worried','nervous','overwhelmed','panic','😳','🥹','😬'],
+      calm: ['calm','peaceful','relaxed','serene','chill','🧘','🌿','🌊','😌'],
+      motivated: ['motivated','inspired','driven','hustle','focus','grind','productive','✨','🔥'],
+      nostalgic: ['nostalgic','nostalgia','memories','missing old','yadein','यादें','🕰️','📼']
+    };
+
+    // Build emoji bar
+    const emojiBar = document.getElementById('emojiBar');
+    EMOJI_MAP.forEach(({e,m})=>{
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'emoji-btn'; b.textContent = e; b.title = m;
+      b.addEventListener('click', ()=>{ document.getElementById('mood').value = e; bounceSparks(e); });
+      emojiBar.appendChild(b);
+    });
+
+    function inferMood(text){
+      if(!text) return 'fine';
+      const t = text.toLowerCase();
+      for(const key in MOOD_MAP){ if(MOOD_MAP[key].some(w => t.includes(w))) return key; }
+      // check single emoji fallback
+      for(const {e,m} of EMOJI_MAP){ if(text.includes(e)) return m; }
+      return 'fine';
+    }
+
+    // --- Image-based vibe (average color & brightness) ---
+    const imgInput = document.getElementById('imgInput');
+    const imgCanvas = document.getElementById('imgCanvas');
+    let imageMood = null;
+    imgInput.addEventListener('change', (e)=>{
+      const file = e.target.files[0];
+      if(!file) return; const img = new Image();
+      img.onload = ()=>{
+        const w = 220, h = Math.max(140, Math.round(img.height * (220/img.width)));
+        imgCanvas.width = w; imgCanvas.height = h;
+        const ctx = imgCanvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+        const data = ctx.getImageData(0,0,w,h).data;
+        let r=0,g=0,b=0, n=0;
+        for(let i=0;i<data.length;i+=4){ r+=data[i]; g+=data[i+1]; b+=data[i+2]; n++; }
+        r/=n; g/=n; b/=n;
+        const max = Math.max(r,g,b), min = Math.min(r,g,b);
+        const l = (max+min)/510; // 0..1
+        const s = max===min?0:(max-min)/(1-Math.abs(2*l-1));
+        let hdeg = 0;
+        if(max===r) hdeg = 60*((g-b)/(max-min));
+        else if(max===g) hdeg = 60*(2 + (b-r)/(max-min));
+        else hdeg = 60*(4 + (r-g)/(max-min));
+        if(isNaN(hdeg)) hdeg = 0; hdeg = (hdeg+360)%360;
+        // Map simple buckets
+        if(l < 0.28) imageMood = 'sad';
+        else if(l > 0.78) imageMood = 'happy';
+        else if(s < 0.15) imageMood = 'calm';
+        else if(hdeg < 25 || hdeg > 330) imageMood = 'angry';
+        else if(hdeg >=25 && hdeg < 70) imageMood = 'motivated';
+        else if(hdeg >=70 && hdeg < 160) imageMood = 'calm';
+        else if(hdeg >=160 && hdeg < 260) imageMood = 'lonely';
+        else imageMood = 'fine';
+        document.getElementById('mood').value = (document.getElementById('mood').value + ' ').trim();
+        bounceSparks('🖼️');
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    // --- Library of poems/shayari (60+ pieces) ---
+    const LIB = {
+      en: {
+        common: [
+          {
+            title: 'I Wandered Lonely as a Cloud (Daffodils)',
+            author: 'William Wordsworth',
+            content: `I wandered lonely as a cloud
+That floats on high o'er vales and hills,
+When all at once I saw a crowd,
+A host, of golden daffodils;`
+          }
+        ],
+        happy: [
+          { title: 'Today', author: 'Original', content: `Sunlight on the desk,
+a checklist finally smiling—
+hello, easy day.`},
+          { title: 'Boulevard', author: 'Original', content: `Cafés clink open;
+I pocket three warm minutes
+and spend them on you.`},
+          { title: 'Pocket Sky', author: 'Original', content: `Clouds learn my name—
+even the wind says hi
+in lowercase.`}
+        ],
+        fine: [
+          { title: 'Perfectly Ordinary', author: 'Original', content: `Some days taste like lukewarm tea;
+that’s fine—
+sweetness returns quietly.`},
+          { title: 'Between', author: 'Original', content: `Neither storm nor sun—
+just weather enough
+to keep walking.`},
+          { title: 'Grey Hoodie', author: 'Original', content: `Comfort has a drawstring;
+I tie it once
+and breathe.`}
+        ],
+        calm: [
+          { title: 'Small Lake', author: 'Original', content: `I learn from water
+how to keep moving
+without making a sound.`},
+          { title: 'Tea Steam', author: 'Original', content: `Let questions rise,
+thin and harmless—
+answers cool in time.`},
+          { title: 'Quiet Switch', author: 'Original', content: `I flip the light
+inside my chest
+to moon.`}
+        ],
+        sad: [
+          { title: 'Rain', author: 'Original', content: `Let the sky cry tonight;
+we’ll borrow its courage
+and breathe again.`},
+          { title: 'Street After', author: 'Original', content: `Shoelaces in puddles—
+I keep walking, anyway;
+my name is buoyant.`},
+          { title: 'Windowpaper', author: 'Original', content: `Tape on the glass—
+cracks still hold the room
+together.`}
+        ],
+        lonely: [
+          { title: 'Window', author: 'Original', content: `Streetlight on the wall—
+proof that even from a distance,
+things can keep you warm.`},
+          { title: 'Late Inbox', author: 'Original', content: `Typing… disappears.
+I send myself a goodnight
+and read it.`},
+          { title: 'Elevator', author: 'Original', content: `We face the numbers
+so we don’t have to face
+our faces.`}
+        ],
+        love: [
+          { title: 'Sonnet 18 (excerpt)', author: 'William Shakespeare', content: `Shall I compare thee to a summer’s day?
+Thou art more lovely and more temperate:`},
+          { title: 'Paper Boats', author: 'Original', content: `I write your name
+on the margin of a cloud—
+it still finds you.`},
+          { title: 'Pulse', author: 'Original', content: `Your laugh teaches
+my ribs to play
+xylophone.`}
+        ],
+        angry: [
+          { title: 'Breath', author: 'Original', content: `Count the tide back in—
+spare the shore your storm.`},
+          { title: 'Sparks', author: 'Original', content: `Keep the ember;
+don’t gift the room
+your wildfire.`},
+          { title: 'Jaw', author: 'Original', content: `Unclench—
+let the sentence end
+without breaking.`}
+        ],
+        anxious: [
+          { title: 'Anchor', author: 'Original', content: `Name five things you trust;
+start with your heartbeat.
+Stay.`},
+          { title: 'Checklist', author: 'Original', content: `I number clouds—
+by three I forget
+why I was worried.`},
+          { title: 'Pocket Stone', author: 'Original', content: `Smooth worry down
+until it is just
+another river.`}
+        ],
+        motivated: [
+          { title: 'Begin', author: 'Original', content: `Sharpen the morning—
+not with noise, but with a promise
+you intend to keep.`},
+          { title: 'Desk Lamp', author: 'Original', content: `Light the corner,
+not the whole world—
+then move the lamp.`},
+          { title: 'Version', author: 'Original', content: `Ship the draft.
+Perfect shows up
+after hello.`}
+        ],
+        nostalgic: [
+          { title: 'Attic Light', author: 'Original', content: `We opened a box of air—
+and all the summers ran out.`},
+          { title: 'Old Passwords', author: 'Original', content: `I still remember
+what 2009 thought
+was secret.`},
+          { title: 'Bus Ticket', author: 'Original', content: `Ink faded, route gone—
+my city still
+knows the turn.`}
+        ]
+      },
+      hi: {
+        common: [
+          { title: 'डैफ़ोडिल्स (अनुवाद अंश)', author: 'विलियम वर्ड्सवर्थ', content: `मैं बादल-सा भटका,
+पहाड़ियों-घाटियों के ऊपर;
+अचानक दिखीं सोने-सी डैफ़ोडिलें—
+झील के पास, पेड़ों तले,
+हवा में नाचती, फड़फड़ाती।`}
+        ],
+        happy: [
+          { title: 'हल्की सी धूप', author: 'मौलिक', content: `बालकनी में बैठी धूप,
+चाय की भाप में मुस्कान—
+दिन आज आसान।`},
+          { title: 'गुब्बारे', author: 'मौलिक', content: `छत से बाँध दिए
+दो-तीन छोटे सपने—
+हवा ने हाँ कह दी।`},
+          { title: 'चिट्ठी', author: 'मौलिक', content: `जेब में रखी चिट्ठी,
+बिना पते की—
+फिर भी पहुँच जाती है।`}
+        ],
+        fine: [
+          { title: 'ठीक-ठाक', author: 'मौलिक', content: `न नश्तर-सा दर्द,
+न कोई खास खुशी—
+यही भी एक राहत है।`},
+          { title: 'बीच-बीच', author: 'मौलिक', content: `न आँधी, न त्यौहार—
+बस इतना मौसम कि
+चलते रहें।`},
+          { title: 'कप', author: 'मौलिक', content: `गर्म कप में
+ठंडी शाम—
+हाथों को यक़ीन।`}
+        ],
+        calm: [
+          { title: 'सादा पानी', author: 'मौलिक', content: `बहना भी सीखो,
+शोर किए बिना—
+जैसे नदी।`},
+          { title: 'धीमी रोशनी', author: 'मौलिक', content: `दीवार पर फिसलती
+पीली किरण—
+कमरा मना लेती है।`},
+          { title: 'रात की चिट्ठी', author: 'मौलिक', content: `चाँद ने लिखा—
+सो जाओ अब;
+सुबह जवाब देना।`}
+        ],
+        sad: [
+          { title: 'बरसात', author: 'मौलिक', content: `आसमान रो ले आज,
+हम बाद में मुसकाएँगे—
+आसू धुल जाएँगे।`},
+          { title: 'फर्श', author: 'मौलिक', content: `काँच-से दिल पर
+काग़ज़-सी पट्टी—
+फिर भी चलना है।`},
+          { title: 'काले बादल', author: 'मौलिक', content: `घनी स्याही में भी
+कुछ सितारे बचते हैं—
+वही राह बनेंगे।`}
+        ],
+        lonely: [
+          { title: 'खिड़की', author: 'मौलिक', content: `सड़क-बत्ती की लौ,
+दूर से भी समझाती है—
+रिश्ते पास हैं।`},
+          { title: 'सीढ़ियाँ', author: 'मौलिक', content: `एक-एक पायदान पर
+मेरे कदम और मेरी
+धड़कन साथ।`},
+          { title: 'स्टेशन', author: 'मौलिक', content: `घड़ी रुकी नहीं,
+ट्रेन भी जाएगी—
+मैं भी जाऊँगा।`}
+        ],
+        love: [
+          { title: 'ग़ालिब (शेर)', author: 'मिर्ज़ा ग़ालिब', content: `हज़ारों ख़्वाहिशें ऐसी कि हर ख़्वाहिश पे दम निकले,
+बहुत निकले मेरे अरमान, लेकिन फिर भी कम निकले।`},
+          { title: 'काग़ज़ की नाव', author: 'मौलिक', content: `तेरा नाम लिखकर
+बादल की धार पर—
+बरस में भी मिलते हैं।`},
+          { title: 'धड़कन', author: 'मौलिक', content: `तेरी हँसी ने
+मेरी पसलियों को
+राग सिखा दिया।`}
+        ],
+        angry: [
+          { title: 'ठहरो', author: 'मौलिक', content: `लफ़्ज़ों को धार न दो—
+चुप्पी भी समझाती है।`},
+          { title: 'दहलीज़', author: 'मौलिक', content: `ग़ुस्सा दरवाज़े तक—
+अंदर रिश्ते रहते हैं।`},
+          { title: 'मुट्ठी', author: 'मौलिक', content: `खुल जाए तो
+हवा भी अपनी लगती है—
+खोल दो।`}
+        ],
+        anxious: [
+          { title: 'साँस', author: 'मौलिक', content: `पाँच भरोसे गिनो—
+पहला, अपनी धड़कन;
+बाक़ी खुद आ जाएँगे।`},
+          { title: 'गिनती', author: 'मौलिक', content: `बादलों को गिनते-गिनते
+घबराhट उतरती है—
+बारिश रह जाती है।`},
+          { title: 'कंकड़', author: 'मौलिक', content: `जेब का छोटा पत्थर—
+चिन्ता घिसते-घिसते
+मुलायम हो जाती है।`}
+        ],
+        motivated: [
+          { title: 'आरंभ', author: 'मौलिक', content: `सुबह को तेज़ करो,
+शोर से नहीं—
+एक सच्चे वादे से।`},
+          { title: 'दीपक', author: 'मौलिक', content: `पहले कोना जगाओ,
+फिर पूरी रौशनी—
+यही तरक़्क़ी है।`},
+          { title: 'मुसव्वदा', author: 'मौलिक', content: `ख़त भेजो पहले—
+बेहतरियाँ
+रास्ते में मिलती हैं।`}
+        ],
+        nostalgic: [
+          { title: 'बक्सा', author: 'मौलिक', content: `पुराना बक्सा खोला,
+और सारे सावन उड़ पड़े।`},
+          { title: 'टेप', author: 'मौलिक', content: `कैसेट उलटी—
+यादें सही-सही
+चल पड़ीं।`},
+          { title: 'स्कूल बेल', author: 'मौलिक', content: `आधी छुट्टी की
+आवाज़ आज भी
+भूख बढ़ा देती है।`}
+        ]
+      }
+    };
+
+    function pickByMood(lang, mood){
+      const list = [];
+      list.push(...LIB[lang].common);
+      const moodList = LIB[lang][mood] || LIB[lang].fine;
+      list.push(...moodList);
+      return list;
+    }
+
+    function renderPoems(lang, mood){
+      const grid = document.getElementById('poemGrid');
+      const items = pickByMood(lang, mood);
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'poem';
+        card.innerHTML = `<h3>${item.title}</h3><div class="tiny">by ${item.author} • ${lang === 'en' ? 'English' : 'हिन्दी'}</div><pre>${item.content}</pre>`;
+        sprinkle(card, mood);
+        grid.appendChild(card);
+      });
+    }
+
+    function updateGreeting(name, mood, lang){
+      const moodNice = mood.charAt(0).toUpperCase() + mood.slice(1);
+      const langNice = lang === 'en' ? 'English' : (lang === 'hi' ? 'हिन्दी' : 'Both');
+      document.getElementById('greeting').textContent = `Hi ${name} — mood sensed: ${moodNice} • language: ${langNice}`;
+    }
+
+    const form = document.getElementById('moodForm');
+    const results = document.getElementById('results');
+    const switchBtn = document.getElementById('switchLang');
+
+    let STATE = { name: '', mood: 'fine', lang: 'en' };
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim() || 'Friend';
+      const lang = document.getElementById('language').value;
+      const moodText = document.getElementById('mood').value;
+      const mEmoji = inferMood(moodText);
+      const mood = imageMood || mEmoji || 'fine';
+      STATE = { name, mood, lang };
+      localStorage.setItem('moodMuse', JSON.stringify(STATE));
+      results.style.display = 'block';
+      document.getElementById('poemGrid').innerHTML='';
+      updateGreeting(name, mood, lang === 'mix' ? 'en' : lang);
+      renderPoems(lang === 'mix' ? 'en' : lang, mood);
+      if(lang === 'mix'){
+        const sep = document.createElement('div');
+        sep.className = 'tiny'; sep.style.margin = '6px 0'; sep.textContent = '— हिन्दी —';
+        document.getElementById('poemGrid').appendChild(sep);
+        renderPoems('hi', mood);
+      }
+      window.scrollTo({ top: results.offsetTop - 10, behavior: 'smooth' });
+      imageMood = null; // reset after use
+    });
+
+    document.getElementById('randomBtn').addEventListener('click', ()=>{
+      const names = [' Dost ', ' Mitra ', ' دوست ', ' Friend '];
+      document.getElementById('name').value = names[Math.floor(Math.random()*names.length)].trim();
+      document.getElementById('mood').value = ['fine','happy','calm','sad','lonely','love','anxious','motivated','nostalgic','angry'][Math.floor(Math.random()*10)];
+      form.dispatchEvent(new Event('submit'));
+    });
+
+    switchBtn.addEventListener('click', ()=>{
+      if(!results.style.display || results.style.display === 'none') return;
+      const nextLang = STATE.lang === 'en' ? 'hi' : 'en';
+      STATE.lang = nextLang;
+      document.getElementById('poemGrid').innerHTML='';
+      updateGreeting(STATE.name, STATE.mood, nextLang);
+      renderPoems(nextLang, STATE.mood);
+    });
+
+    // Restore state if available
+    try{
+      const saved = JSON.parse(localStorage.getItem('moodMuse'));
+      if(saved && saved.name){
+        STATE = saved; 
+        document.getElementById('name').value = STATE.name;
+        document.getElementById('language').value = STATE.lang;
+        document.getElementById('mood').value = STATE.mood;
+        results.style.display = 'block';
+        document.getElementById('poemGrid').innerHTML='';
+        updateGreeting(STATE.name, STATE.mood, STATE.lang === 'mix' ? 'en' : STATE.lang);
+        renderPoems(STATE.lang === 'mix' ? 'en' : STATE.lang, STATE.mood);
+        if(STATE.lang === 'mix'){
+          const sep = document.createElement('div');
+          sep.className = 'tiny'; sep.style.margin = '6px 0'; sep.textContent = '— हिन्दी —';
+          document.getElementById('poemGrid').appendChild(sep);
+          renderPoems('hi', STATE.mood);
+        }
+      }
+    }catch{}
+
+    // tiny animated emoji sparks based on mood
+    const MOOD_SPARK = {
+      happy:['✨','🌤️','🥰'],
+      fine:['🌫️','🌤️','✨'],
+      calm:['🌙','🌿','🫖'],
+      sad:['💧','🌧️','🌫️'],
+      lonely:['🪟','🌙','🌌'],
+      love:['❤️','💖','🌸'],
+      angry:['⚡','🔥','💢'],
+      anxious:['🫨','🌀','🫁'],
+      motivated:['🚀','✨','📌'],
+      nostalgic:['📼','🕰️','🌆']
+    };
+    function sprinkle(node, mood){
+      const list = MOOD_SPARK[mood] || ['✨'];
+      for(let i=0;i<3;i++){
+        const s = document.createElement('div');
+        s.className='spark';
+        s.textContent = list[i%list.length];
+        s.style.left = (8 + Math.random()*60)+'%';
+        s.style.bottom = (-6 + Math.random()*8)+'px';
+        s.style.animationDelay = (Math.random()*2)+'s';
+        node.appendChild(s);
+      }
+    }
+    function bounceSparks(e){
+      const btns = document.querySelectorAll('.emoji-btn');
+      btns.forEach(b=>{ if(b.textContent===e){ b.animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:300, easing:'ease'}); } });
+    }
+  </script>
+</body>
+</html>
